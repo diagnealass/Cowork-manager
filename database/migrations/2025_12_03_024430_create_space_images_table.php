@@ -6,20 +6,21 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('space_images', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('space_id')->constrained()->onDelete('cascade');
+            $table->string('image_path');
+            $table->boolean('is_primary')->default(false);
+            $table->integer('order')->default(0);
             $table->timestamps();
+
+            $table->index('space_id');
+            $table->index(['space_id', 'is_primary']);
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('space_images');

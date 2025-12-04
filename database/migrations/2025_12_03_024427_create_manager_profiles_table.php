@@ -13,7 +13,15 @@ return new class extends Migration
     {
         Schema::create('manager_profiles', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->text('bio')->nullable();
+            $table->string('company_registration')->nullable();
+            $table->string('tax_id')->nullable();
+            $table->text('bank_account')->nullable();
+            $table->timestamp('verified_at')->nullable();
             $table->timestamps();
+
+            $table->index('user_id');
         });
     }
 
