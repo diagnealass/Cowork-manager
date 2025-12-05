@@ -1,59 +1,134 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+Coworking Management System – Laravel
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Un projet Laravel complet permettant de gérer un espace de coworking : réservations, salles, utilisateurs, abonnements, facturation, gestion des ressources, etc.
+Ce projet a été pensé comme une application professionnelle avec une architecture propre, une base solide (ERD), et une structure évolutive pour en faire un futur SaaS.
 
-## About Laravel
+🚀 Fonctionnalités principales
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+🧑‍💼 Gestion des utilisateurs
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Création, modification, suppression
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Rôles (Admin / Manager / Client)
 
-## Learning Laravel
+Authentification Laravel Breeze / Jetstream (selon installation)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+🏢 Gestion des salles de coworking
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Types de salles (privée, open-space, salle de réunion…)
 
-## Laravel Sponsors
+Capacité, équipements, disponibilité
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+📅 Réservations
 
-### Premium Partners
+Réserver une salle sur une plage horaire
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+Empêcher les conflits de réservation
 
-## Contributing
+Historique des réservations
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+💳 Abonnements / Tarification
 
-## Code of Conduct
+Packs mensuels, journaliers ou à l’heure
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Paiements (selon intégration future Stripe/PayTech)
 
-## Security Vulnerabilities
+📊 Dashboard administrateur
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Vue globale : statistiques, revenu, taux d’occupation
 
-## License
+Gestion des ressources et équipements
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+⚙️ Architecture claire
+
+Modèles Laravel + Relations Eloquent
+
+Migrations + Seeders
+
+Services / Repositories (si utilisés)
+
+ERD défini dans le dossier /docs/
+
+🗂️ Structure du projet
+├── app/
+│   ├── Models/
+│   ├── Http/Controllers/
+│   ├── Services/
+├── database/
+│   ├── migrations/
+│   ├── seeders/
+├── resources/
+│   ├── views/
+│   ├── components/
+├── public/
+├── routes/
+│   └── web.php
+└── docs/
+    └── ERD_coworking.pdf
+
+🔧 Installation & Configuration
+ Cloner le projet
+git clone https://github.com/diagnealass/Cowork-manager.git
+cd Cowork-manager
+
+
+🔌 Relations Eloquent utilisées
+
+Le système utilise les relations suivantes :
+
+🔹 User → Reservations
+
+Un utilisateur peut effectuer plusieurs réservations.
+
+public function reservations() {
+    return $this->hasMany(Reservation::class);
+}
+
+🔹 Room → Reservations
+
+Une salle peut être réservée plusieurs fois.
+
+public function reservations() {
+    return $this->hasMany(Reservation::class);
+}
+
+🔹 Plan (Abonnement) ↔ Users
+
+Un utilisateur peut avoir un abonnement.
+
+public function plan() {
+    return $this->belongsTo(Plan::class);
+}
+
+🔹 Many-to-Many (si équipements de salle)
+
+Room ↔ Equipment
+
+🎨 Interface & Design
+
+Le projet utilise :
+
+TailwindCSS
+
+Blade Components
+
+Layouts centralisés (layouts/app.blade.php)
+
+Un footer incluant :
+
+<p class="text-center text-gray-500 text-sm">© {{ date('Y') }} Coworking Manager – Tous droits réservés.</p>
+
+👥 Participation / Contribution
+
+Les contributions sont les bienvenues :
+
+📜 Licence
+
+Libre d’utilisation pour l’apprentissage et les projets personnels.
+
+👍 Auteur
+
+Alassane DIAGNE
+Étudiant en Informatique – UIDT
+Développeur Web & Mobile en progression
+📧 diagnealass03@gmail.com
