@@ -2,47 +2,137 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
         'name',
         'email',
         'password',
+        'phone_number',
+        'company_name',
+        'avatar',
+        'role',
+        'is_active',
+        'last_login_at',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'last_login_at' => 'datetime',
+        'is_active' => 'boolean',
+        'password' => 'hashed',
+    ];
+
+    // ========================================
+    // RELATIONS
+    // ========================================
+
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
+     * Un user peut avoir UN profil manager (1:1)
      */
-    protected function casts(): array
+    public function managerProfile()
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return $this->hasOne(ManagerProfile::class);
+    }
+
+    /**
+     * Un user peut faire PLUSIEURS réservations (1:N)
+     */
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class);
+    }
+
+    /**
+     * Un user peut écrire PLUSIEURS avis (1:N)
+     */
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    // ========================================
+    // SCOPES (Requêtes réutilisables)
+    // ========================================
+
+    /**
+     * Seulement les utilisateurs actifs
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
+    /**
+     * Seulement les managers
+     */
+    public function scopeManagers($query)
+    {
+        return $query->where('role', 'manager');
+    }
+
+    /**
+     * Seulement les clients
+     */
+    public function scopeClients($query)
+    {
+        return $query->where('role', 'client');
+    }
+
+    /**
+     * Seulement les admins
+     */
+    public function scopeAdmins($query)
+    {
+        return $query->where('role', 'admin');
+    }
+
+    // ========================================
+    // MÉTHODES UTILES
+    // ========================================
+
+    /**
+     * Vérifier si l'utilisateur est admin
+     */
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
+
+    /**
+     * Vérifier si l'utilisateur est manager
+     */
+    public function isManager()
+    {
+        return $this->role === 'manager';
+    }
+
+    /**
+     * Vérifier si l'utilisateur est client
+     */
+    public function isClient()
+    {
+        return $this->role === 'client';
+    }
+
+    /**
+     * Obtenir l'URL de l'avatar
+     */
+    public function getAvatarUrlAttribute()
+    {
+        return $this->avatar
+            ? asset('storage/' . $this->avatar)
+            : 'https://ui-avatars.com/api/?name=' . urlencode($this->name);
     }
 }
