@@ -12,8 +12,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('space_id')->constrained()->onDelete('cascade');
             $table->tinyInteger('day_of_week')->unsigned();
-            $table->time('open_time');
-            $table->time('close_time');
+            $table->time('open_time')->nullable();
+            $table->time('close_time')->nullable();
             $table->boolean('is_closed')->default(false);
             $table->timestamps();
 
