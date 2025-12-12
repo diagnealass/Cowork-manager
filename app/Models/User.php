@@ -53,7 +53,7 @@ class User extends Authenticatable
     {
         return $this->hasMany(Booking::class);
     }
-
+    
     /**
      * Un user peut écrire PLUSIEURS avis (1:N)
      */
