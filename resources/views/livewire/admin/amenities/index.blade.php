@@ -1,5 +1,17 @@
 <div class="space-y-6">
 
+    <!-- Script pour scroll automatique -->
+    <script>
+        document.addEventListener('livewire:updated', function() {
+            const createForm = document.getElementById('create-form');
+            if (createForm) {
+                setTimeout(() => {
+                    createForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+            }
+        });
+    </script>
+
     <!-- Flash Messages -->
     @if (session()->has('success'))
         <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg relative" role="alert">
@@ -7,35 +19,53 @@
         </div>
     @endif
 
-    <!-- Header Actions -->
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
-            <!-- Search -->
-            <div class="w-full sm:w-96">
-                <div class="relative">
-                    <input
-                        type="text"
-                        wire:model.live.debounce.300ms="search"
-                        placeholder="🔍 Rechercher un équipement..."
-                        class="w-full px-4 py-2 pl-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-                    >
-                    <svg class="w-5 h-5 absolute left-3 top-2.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                    </svg>
-                </div>
+    <!-- Header + Search + Button -->
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6 relative z-10">
+    <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+
+        <!-- Titre -->
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white">
+            📦 Gestion des Équipements
+        </h2>
+
+        <!-- Actions groupe -->
+        <div class="flex flex-col md:flex-row items-center gap-3 w-full md:w-auto">
+
+            <!-- Search Bar -->
+            <div class="relative w-full md:w-80">
+                <input
+                    type="text"
+                    wire:model.live.debounce.300ms="search"
+                    placeholder="🔍 Rechercher..."
+                    class="w-full px-4 py-2.5 pl-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                >
+                <svg class="w-5 h-5 absolute left-3 top-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
             </div>
 
             <!-- Create Button -->
             <button
+                onclick="this.disabled = true; setTimeout(() => { this.disabled = false; }, 500);"
                 wire:click="openCreateModal"
-                class="w-full sm:w-auto px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2 shadow-lg">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                @if($showCreateModal) @endif
+                style="background: linear-gradient(to right, #22c55e, #16a34a); box-shadow: 0 10px 25px rgba(34, 197, 94, 0.4); padding: 0.75rem 1.75rem; display: flex; align-items: center; gap: 0.75rem; color: white; font-weight: bold; font-size: 1rem; border: none; border-radius: 0.5rem; cursor: pointer; position: relative; z-index: 30; flex-shrink: 0;"
+                class="hover:shadow-2xl active:scale-95 transition-all duration-200"
+                onmouseover="this.style.boxShadow='0 15px 35px rgba(34, 197, 94, 0.6)'"
+                onmouseout="this.style.boxShadow='0 10px 25px rgba(34, 197, 94, 0.4)'"
+                title="Cliquez pour ajouter un nouvel équipement">
+                <svg class="w-6 h-6" style="flex-shrink: 0;" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
                 </svg>
-                <span class="font-medium">Nouvel Équipement</span>
+                <div style="display: flex; flex-direction: column; align-items: flex-start; line-height: 1.2;">
+                    <span style="font-size: 0.95rem; font-weight: 600; color: white;">Nouvel Équipement</span>
+                    <span style="font-size: 0.8rem; font-weight: 400; color: rgba(255, 255, 255, 0.85);">Ajouter un équipement</span>
+                </div>
             </button>
+
         </div>
     </div>
+</div>
 
     <!-- Amenities Table -->
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
@@ -164,181 +194,220 @@
         @endif
     </div>
 
-    <!-- Create Modal -->
-    @if($showCreateModal)
-        <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-            <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-
-                <!-- Background overlay -->
-                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" wire:click="closeCreateModal"></div>
-
-                <!-- Modal panel -->
-                <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                    <form wire:submit.prevent="create">
-                        <div class="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
-                                Créer un équipement
-                            </h3>
-
-                            <!-- Name -->
-                            <div class="mb-4">
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Nom *
-                                </label>
-                                <input
-                                    type="text"
-                                    wire:model="name"
-                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-                                    placeholder="ex: WiFi, Projecteur..."
-                                >
-                                @error('name')
-                                    <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
-                                @enderror
-                            </div>
-
-                            <!-- Icon -->
-                            <div class="mb-4">
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Icône (emoji)
-                                </label>
-                                <input
-                                    type="text"
-                                    wire:model="icon"
-                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-                                    placeholder="📶 🖥️ ❄️"
-                                >
-                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                    💡 Suggestions: 📶 WiFi | 🖥️ Écran | 🎤 Micro | ❄️ Clim | ☕ Café | 🅿️ Parking | 🖨️ Imprimante
-                                </p>
-                                @error('icon')
-                                    <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
-                                @enderror
-                            </div>
-
-                            <!-- Category -->
-                            <div class="mb-4">
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Catégorie
-                                </label>
-                                <select
-                                    wire:model="category"
-                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
-                                    <option value="">Sélectionner une catégorie</option>
-                                    <option value="connectivity">🌐 Connectivité</option>
-                                    <option value="comfort">🛋️ Confort</option>
-                                    <option value="equipment">🖥️ Équipement</option>
-                                    <option value="services">☕ Services</option>
-                                </select>
-                                @error('category')
-                                    <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <!-- Modal Actions -->
-                        <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                            <button
-                                type="submit"
-                                class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
-                                Créer
-                            </button>
-                            <button
-                                type="button"
-                                wire:click="closeCreateModal"
-                                class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-800 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                                Annuler
-                            </button>
-                        </div>
-                    </form>
+    <!-- Create Form Panel -->
+@if($showCreateModal)
+    <div id="create-form" class="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-gray-900 dark:to-gray-800 border-4 border-green-500 dark:border-green-600 rounded-xl shadow-2xl p-8 mb-6 scroll-mt-6 animate-in fade-in duration-300">
+        <form wire:submit.prevent="create" class="space-y-6">
+            <!-- Header -->
+            <div class="mb-8 pb-6 border-b-2 border-green-200 dark:border-green-700">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-3xl font-black text-green-700 dark:text-green-400">
+                            ✨ Créer un nouvel équipement
+                        </h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">Remplissez les champs ci-dessous pour ajouter un équipement</p>
+                    </div>
+                    <button
+                        type="button"
+                        wire:click="closeCreateModal"
+                        class="text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 transition-colors p-2">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
                 </div>
             </div>
+
+            <!-- Body -->
+            <div class="space-y-6">
+
+                    <!-- Name -->
+                    <div class="bg-white dark:bg-gray-800 p-4 rounded-lg">
+                        <label class="block text-base font-bold text-gray-800 dark:text-gray-200 mb-3">
+                            🏷️ Nom de l'équipement *
+                        </label>
+                        <input
+                            type="text"
+                            wire:model="name"
+                            class="w-full px-4 py-3 border-2 border-green-400 dark:border-green-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-600 dark:bg-gray-700 dark:text-white bg-white text-gray-900 text-base"
+                            placeholder="ex: WiFi, Projecteur, Climatisation..."
+                            autofocus
+                        >
+                        @error('name')
+                            <span class="text-red-500 text-sm mt-2 block font-semibold">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <!-- Icon -->
+                    <div class="bg-white dark:bg-gray-800 p-4 rounded-lg">
+                        <label class="block text-base font-bold text-gray-800 dark:text-gray-200 mb-3">
+                            😊 Icône (emoji)
+                        </label>
+                        <input
+                            type="text"
+                            wire:model="icon"
+                            class="w-full px-4 py-3 border-2 border-green-400 dark:border-green-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-600 dark:bg-gray-700 dark:text-white bg-white text-gray-900 text-base"
+                            placeholder="📶 🖥️ ❄️"
+                        >
+                        <p class="text-sm text-gray-700 dark:text-gray-300 mt-3 bg-yellow-100 dark:bg-yellow-900 p-2 rounded">
+                            💡 <strong>Suggestions:</strong> 📶 WiFi | 🖥️ Écran | 🎤 Micro | ❄️ Clim | ☕ Café
+                        </p>
+                        @error('icon')
+                            <span class="text-red-500 text-sm mt-2 block font-semibold">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <!-- Category -->
+                    <div class="bg-white dark:bg-gray-800 p-4 rounded-lg">
+                        <label class="block text-base font-bold text-gray-800 dark:text-gray-200 mb-3">
+                            📂 Catégorie
+                        </label>
+                        <select
+                            wire:model="category"
+                            class="w-full px-4 py-3 border-2 border-green-400 dark:border-green-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-600 dark:bg-gray-700 dark:text-white bg-white text-gray-900 text-base">
+                            <option value="">-- Sélectionner une catégorie --</option>
+                            <option value="connectivity">🌐 Connectivité</option>
+                            <option value="comfort">🛋️ Confort</option>
+                            <option value="equipment">🖥️ Équipement</option>
+                            <option value="services">☕ Services</option>
+                        </select>
+                        @error('category')
+                            <span class="text-red-500 text-sm mt-2 block font-semibold">{{ $message }}</span>
+                        @enderror
+                    </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="flex flex-col-reverse sm:flex-row justify-end gap-4 mt-8 pt-6 border-t-2 border-green-300 dark:border-green-700 relative z-10">
+                <button
+                    type="button"
+                    wire:click="closeCreateModal"
+                    class="px-6 py-3 border-2 border-red-400 dark:border-red-600 rounded-lg text-red-600 dark:text-red-400 bg-white dark:bg-gray-800 hover:bg-red-50 dark:hover:bg-gray-700 font-bold transition-colors text-base flex items-center justify-center gap-2 relative z-20">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                    </svg>
+                    <span>Annuler</span>
+                </button>
+
+                <button
+                    type="submit"
+                    style="position: relative; z-index: 30; background: linear-gradient(to right, #22c55e, #16a34a); color: white;"
+                    class="px-7 py-3 hover:from-green-600 hover:to-green-700 text-white font-bold rounded-lg shadow-lg transition-all duration-200 hover:shadow-xl text-base flex items-center justify-center gap-2 border-0"
+                    onmouseover="this.style.boxShadow='0 20px 40px rgba(34, 197, 94, 0.5)'"
+                    onmouseout="this.style.boxShadow='0 10px 25px rgba(34, 197, 94, 0.3)'">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                    <span>Ajouter l'équipement</span>
+                </button>
+            </div>
+
+            </form>
         </div>
-    @endif
-
-    <!-- Edit Modal -->
-    @if($showEditModal)
-        <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-            <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-
-                <!-- Background overlay -->
-                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" wire:click="closeEditModal"></div>
-
-                <!-- Modal panel -->
-                <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                    <form wire:submit.prevent="update">
-                        <div class="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
-                                Modifier l'équipement
-                            </h3>
-
-                            <!-- Name -->
-                            <div class="mb-4">
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Nom *
-                                </label>
-                                <input
-                                    type="text"
-                                    wire:model="name"
-                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-                                >
-                                @error('name')
-                                    <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
-                                @enderror
-                            </div>
-
-                            <!-- Icon -->
-                            <div class="mb-4">
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Icône (emoji)
-                                </label>
-                                <input
-                                    type="text"
-                                    wire:model="icon"
-                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-                                >
-                                @error('icon')
-                                    <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
-                                @enderror
-                            </div>
-
-                            <!-- Category -->
-                            <div class="mb-4">
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Catégorie
-                                </label>
-                                <select
-                                    wire:model="category"
-                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
-                                    <option value="">Sélectionner une catégorie</option>
-                                    <option value="connectivity">🌐 Connectivité</option>
-                                    <option value="comfort">🛋️ Confort</option>
-                                    <option value="equipment">🖥️ Équipement</option>
-                                    <option value="services">☕ Services</option>
-                                </select>
-                                @error('category')
-                                    <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <!-- Modal Actions -->
-                        <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                            <button
-                                type="submit"
-                                class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
-                                Mettre à jour
-                            </button>
-                            <button
-                                type="button"
-                                wire:click="closeEditModal"
-                                class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-800 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                                Annuler
-                            </button>
-                        </div>
-                    </form>
+    </div>
+@endif
+   <!-- Edit Form Panel -->
+@if($showEditModal)
+    <div id="edit-form" class="bg-gradient-to-r from-amber-50 to-amber-100 dark:from-gray-900 dark:to-gray-800 border-4 border-orange-500 dark:border-orange-600 rounded-xl shadow-2xl p-8 mb-6 scroll-mt-6 animate-in fade-in duration-300">
+        <form wire:submit.prevent="update" class="space-y-6">
+            <!-- Header -->
+            <div class="mb-8 pb-6 border-b-2 border-orange-200 dark:border-orange-700">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-3xl font-black text-orange-700 dark:text-orange-400">
+                            ✏️ Modifier l'équipement
+                        </h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">Modifiez les informations ci-dessous</p>
+                    </div>
+                    <button
+                        type="button"
+                        wire:click="closeEditModal"
+                        class="text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 transition-colors p-2">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
                 </div>
             </div>
-        </div>
-    @endif
 
-</div>
+            <!-- Body -->
+            <div class="space-y-6">
+                    <!-- Name -->
+                    <div class="bg-white dark:bg-gray-800 p-4 rounded-lg">
+                        <label class="block text-base font-bold text-gray-800 dark:text-gray-200 mb-3">
+                            🏷️ Nom de l'équipement *
+                        </label>
+                        <input
+                            type="text"
+                            wire:model="name"
+                            class="w-full px-4 py-3 border-2 border-orange-400 dark:border-orange-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-600 dark:bg-gray-700 dark:text-white bg-white text-gray-900 text-base"
+                        >
+                        @error('name')
+                            <span class="text-red-500 text-sm mt-2 block font-semibold">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <!-- Icon -->
+                    <div class="bg-white dark:bg-gray-800 p-4 rounded-lg">
+                        <label class="block text-base font-bold text-gray-800 dark:text-gray-200 mb-3">
+                            😊 Icône (emoji)
+                        </label>
+                        <input
+                            type="text"
+                            wire:model="icon"
+                            class="w-full px-4 py-3 border-2 border-orange-400 dark:border-orange-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-600 dark:bg-gray-700 dark:text-white bg-white text-gray-900 text-base"
+                        >
+                        @error('icon')
+                            <span class="text-red-500 text-sm mt-2 block font-semibold">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <!-- Category -->
+                    <div class="bg-white dark:bg-gray-800 p-4 rounded-lg">
+                        <label class="block text-base font-bold text-gray-800 dark:text-gray-200 mb-3">
+                            📂 Catégorie
+                        </label>
+                        <select
+                            wire:model="category"
+                            class="w-full px-4 py-3 border-2 border-orange-400 dark:border-orange-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-600 dark:bg-gray-700 dark:text-white bg-white text-gray-900 text-base">
+                            <option value="">-- Sélectionner une catégorie --</option>
+                            <option value="connectivity">🌐 Connectivité</option>
+                            <option value="comfort">🛋️ Confort</option>
+                            <option value="equipment">🖥️ Équipement</option>
+                            <option value="services">☕ Services</option>
+                        </select>
+                        @error('category')
+                            <span class="text-red-500 text-sm mt-2 block font-semibold">{{ $message }}</span>
+                        @enderror
+                    </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="flex flex-col-reverse sm:flex-row justify-end gap-4 mt-8 pt-6 border-t-2 border-orange-300 dark:border-orange-700 relative z-10">
+                <button
+                    type="button"
+                    wire:click="closeEditModal"
+                    class="px-6 py-3 border-2 border-red-400 dark:border-red-600 rounded-lg text-red-600 dark:text-red-400 bg-white dark:bg-gray-800 hover:bg-red-50 dark:hover:bg-gray-700 font-bold transition-colors text-base flex items-center justify-center gap-2 relative z-20">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                    </svg>
+                    <span>Annuler</span>
+                </button>
+
+                <button
+                    type="submit"
+                    style="position: relative; z-index: 30; background: linear-gradient(to right, #f97316, #ea580c); color: white;"
+                    class="px-7 py-3 hover:from-orange-600 hover:to-orange-700 text-white font-bold rounded-lg shadow-lg transition-all duration-200 hover:shadow-xl text-base flex items-center justify-center gap-2 border-0"
+                    onmouseover="this.style.boxShadow='0 20px 40px rgba(249, 115, 22, 0.5)'"
+                    onmouseout="this.style.boxShadow='0 10px 25px rgba(249, 115, 22, 0.3)'">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+                    </svg>
+                    <span>Mettre à jour</span>
+                </button>
+            </div>
+
+            </form>
+        </div>
+    </div>
+@endif
