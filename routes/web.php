@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Admin\Dashboard as AdminDashboard;
 use App\Livewire\Admin\Amenities\Index as AmenitiesIndex;
-
+use App\Livewire\Admin\Spaces\Index as SpacesIndex;
 
 // ============================================
 // ROUTES PUBLIQUES
@@ -40,10 +40,9 @@ Route::prefix('admin')
        // Dans le groupe admin
         Route::get('/dashboard', AdminDashboard::class)->name('dashboard');
 
-        // Spaces
-        Route::get('/spaces', function () {
-            return view('admin.spaces.index');
-        })->name('spaces.index');
+        Route::get('/spaces', SpacesIndex::class)->name('spaces.index');
+
+        
 
         // Bookings
         Route::get('/bookings', function () {
